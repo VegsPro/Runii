@@ -24,8 +24,11 @@ jobs:
 
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
-        with:
-          packages: 'tools platform-tools platforms;android-35 build-tools;35.0.0'
+
+      - name: Accept licenses
+        run: |
+          yes | sdkmanager --licenses || true
+          sdkmanager "platforms;android-35" "build-tools;35.0.0" "platform-tools" || true
 
       - name: Decode keystore
         run: |
@@ -44,13 +47,14 @@ jobs:
       - name: Rename APK
         run: |
           mkdir -p output
-          cp app/build/outputs/apk/release/*.apk output/${{ env.APP_NAME }}-${{ env.VERSION_NAME }}.apk || cp app/build/outputs/apk/release/app-release-unsigned.apk output/ || true
+          find app/build/outputs -name "*.apk" -exec cp {} output/${{ env.APP_NAME }}-${{ env.VERSION_NAME }}.apk \;
+          ls -la output/ || true
           ls -la app/build/outputs/apk/release/ || true
-          ls -la output/
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
           name: ${{ env.APP_NAME }}-${{ env.VERSION_NAME }}
           path: output/
+          if-no-files-found: warn
           retention-days: 30
