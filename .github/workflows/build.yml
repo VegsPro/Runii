@@ -20,34 +20,43 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Setup Android
+      - name: Setup Android SDK
         uses: android-actions/setup-android@v3
 
       - name: Accept Android licenses
-        run: yes | sdkmanager --licenses > /dev/null || true
+        run: |
+          mkdir -p $ANDROID_HOME/licenses
+          echo -e "24333f8a63b6825ea9c5514f83c2829b004d1fee" > $ANDROID_HOME/licenses/android-sdk-license
+          echo -e "84831b94096441f7ae2d" > $ANDROID_HOME/licenses/android-sdk-preview-license
+          echo -e "d56f5187479451be63c5c3" > $ANDROID_HOME/licenses/android-googletv-license || true
+          yes | sdkmanager --licenses || true
+          sdkmanager "platforms;android-35" "build-tools;35.0.0" "platform-tools" || true
 
       - name: Decode keystore
         run: echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > release.keystore
 
-      - name: Grant execute
+      - name: Grant execute permission
         run: chmod +x gradlew
 
-      - name: Build with Gradle
+      - name: Build Release APK
         env:
           KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-        run: ./gradlew assembleRelease --no-daemon
+        run: ./gradlew assembleRelease --no-daemon --stacktrace
 
       - name: Prepare artifact
+        if: success()
         run: |
           mkdir -p output
           APK=$(find app/build/outputs -name "*release*.apk" | head -1)
-          echo "Found: $APK"
-          cp "$APK" output/${{ env.APP_NAME }}-${{ env.VERSION_NAME }}.apk
+          echo "Found APK: $APK"
+          cp "$APK" "output/${{ env.APP_NAME }}-${{ env.VERSION_NAME }}.apk"
           ls -la output/
 
-      - uses: actions/upload-artifact@v4
+      - name: Upload Artifact
+        if: success()
+        uses: actions/upload-artifact@v4
         with:
           name: ${{ env.APP_NAME }}-${{ env.VERSION_NAME }}
           path: output/${{ env.APP_NAME }}-${{ env.VERSION_NAME }}.apk
