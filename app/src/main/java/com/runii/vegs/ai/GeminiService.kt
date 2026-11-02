@@ -29,7 +29,7 @@ class GeminiService {
     private val apiKey = BuildConfig.GEMINI_API_KEY
 
     // Gemini 1.5 Flash / 2.0 Flash endpoint (free tier friendly)
-    private val endpoint = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=$apiKey"
+    private val endpoint = "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=$apiKey"
 
     @Serializable
     data class ContentPart(val text: String)
