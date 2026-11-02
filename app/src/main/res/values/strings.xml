@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Runii</string>
+    <string name="sessions">Сеансы</string>
+    <string name="settings">Настройки</string>
+    <string name="exit">Выйти</string>
+    <string name="new_session">Новый сеанс</string>
+    <string name="choose_world">Выберите мир</string>
+    <string name="inventory">Инвентарь</string>
+    <string name="send">Отправить</string>
+    <string name="your_action">Ваше действие или ответ…</string>
+    <string name="loading">Нейросеть думает…</string>
+    <string name="delete_session">Удалить сеанс</string>
+    <string name="continue_session">Продолжить</string>
+</resources>
